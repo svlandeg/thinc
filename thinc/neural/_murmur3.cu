@@ -11,13 +11,9 @@
  * This version is taken from https://github.com/PeterScott/murmur3
  * and modified to work with CUDA.
  */
-// Including stdint.h is a pain in cupy, so just put the declarations in.
-typedef unsigned char                uint8_t;
-typedef unsigned int                uint32_t;
-typedef unsigned long int        uint64_t;
-typedef signed char                int8_t;
-typedef int                        int32_t;
-typedef long int                int64_t;
+extern "C" {
+#include "stdlib.h"
+}
 
 //-----------------------------------------------------------------------------
 // Platform-specific functions and macros

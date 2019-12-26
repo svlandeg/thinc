@@ -29,7 +29,6 @@ from ..linalg cimport VecVec, Vec
 
 from murmurhash.mrmr cimport hash64, hash128_x86, hash128_x64
 from ..compat import integer_types
-from . import _custom_kernels
 
 cimport blis
 cimport blis.cy

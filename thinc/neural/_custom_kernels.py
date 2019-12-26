@@ -29,8 +29,8 @@ def compile_kernels(src):
 def compile_mmh(src):
     if cupy is None:
         return None
-    return cupy.RawKernel(src, "hash_data")
-
+    print("compiling source")
+    return cupy.RawKernel(src, "hash_data", options=('-I, C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\ucrt'))
     
 PWD = Path(__file__).parent
 SRC = (PWD / "_custom_kernels.cu").open("r", encoding="utf8").read()
@@ -51,7 +51,6 @@ backprop_mish_kernel = KERNELS["backprop_mish"]
 backprop_sum_pool_kernel = KERNELS["backprop_sum_pool"]
 backprop_mean_pool_kernel = KERNELS["backprop_mean_pool"]
 backprop_max_pool_kernel = KERNELS["backprop_max_pool"]
-hash_data_kernel = compile_mmh(MMH_SRC)
 
 
 def seq2col(X, nW, out=None, threads_per_block=128, num_blocks=128):
@@ -188,10 +187,42 @@ def backprop_max_pool(d_maxes, which, lengths, out=None,
 def hash(ids, seed, out=None, threads_per_block=128, num_blocks=128):
     if out is None:
         out = cupy.zeros((ids.shape[0], 4), dtype="uint32")
+        print("out none ->", out)
     # sizeof(uint32_t) * 4
     out_size = 4 * 4
+    print("out_size", out_size)
     in_size = 8 # sizeof(uint64_t)
+    print("in_size", in_size)
     T = ids.shape[0]
+    print("T", T)
+    # print("MMH_SRC", MMH_SRC)
+
+    hash_data_kernel = compile_mmh(MMH_SRC)  # TODO: use KERNELS["hash"] instead ?
+
+    print("hash_data_kernel", hash_data_kernel)
+    print(" attributes", hash_data_kernel.attributes)
+
+    print(" num_blocks", num_blocks)
+    print(" threads_per_block", threads_per_block)
+    print(" out", out)
+    print(" out_size", out_size)
+    print(" in_size", in_size)
+    print(" ids.shape[0]", ids.shape[0])
+    print(" seed", seed)
+
     hash_data_kernel((num_blocks,), (threads_per_block,),
         (out, ids, out_size, in_size, ids.shape[0], seed))
+    print("out", out)
     return out
+
+
+# OLD:
+#
+# def hash(ops, ids, seed):
+#     keys = ops.allocate((ids.shape[0], 4), dtype='uint32')
+#     cdef size_t keys_ptr = keys.data.ptr
+#     cdef size_t ids_ptr = ids.data.ptr
+#
+#     gpu_hash_data(<char*>keys_ptr,
+#         <const char*>ids_ptr, sizeof(uint32_t)*4, sizeof(uint64_t), ids.shape[0], seed)
+#     return keys
