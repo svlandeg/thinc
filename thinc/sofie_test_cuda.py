@@ -10,7 +10,7 @@ if __name__ == "__main__":
     print("PWD", PWD)
     SRC = (PWD / "neural" / "toy.cu").open("r", encoding="utf8").read()
 
-    hash_data_kernel = cupy.RawKernel(SRC, "hash_data")
+    hash_data_kernel = cupy.RawKernel(SRC, "hash_data") #, options=('-G'))
 
     num_blocks = 128
     threads_per_block = 128
@@ -31,3 +31,5 @@ if __name__ == "__main__":
     print("IN", ids)
     print()
     print("OUT", out)
+
+

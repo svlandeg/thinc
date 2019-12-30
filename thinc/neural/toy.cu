@@ -11,12 +11,14 @@
  * This version is taken from https://github.com/PeterScott/murmur3
  * and modified to work with CUDA.
  */
-typedef unsigned char                uint8_t;
-typedef unsigned int                uint32_t;
-typedef unsigned long int        uint64_t;
-typedef signed char                int8_t;
-typedef int                        int32_t;
-typedef long int                int64_t;
+
+
+typedef unsigned char           uint8_t;
+typedef unsigned int            uint32_t;
+typedef unsigned long long      uint64_t;
+typedef signed char             int8_t;
+typedef int                     int32_t;
+typedef long long               int64_t;
 
 
 #define FORCE_INLINE
@@ -37,19 +39,6 @@ __device__ static inline FORCE_INLINE uint64_t rotl64 ( uint64_t x, int8_t r )
 
 //-----------------------------------------------------------------------------
 // Finalization mix - force all bits of a hash block to avalanche
-
-__device__ static inline FORCE_INLINE uint32_t fmix32 ( uint32_t h )
-{
-  h ^= h >> 16;
-  h *= 0x85ebca6b;
-  h ^= h >> 13;
-  h *= 0xc2b2ae35;
-  h ^= h >> 16;
-
-  return h;
-}
-
-//----------
 
 __device__ static inline FORCE_INLINE uint64_t fmix64 ( uint64_t k )
 {
@@ -157,12 +146,13 @@ void hash_data(char* dest,
     int _loop_stride = blockDim.x * gridDim.x;
     for (int i = _loop_start; i < n_items; i += _loop_stride)
     {
-
         const char* src_i = &src[i*in_size];
         char* dest_i = &dest[i*out_size];
 
         MurmurHash3_x64_128(src_i, in_size, seed, entropy);
         for (int j=0; j < out_size; ++j)
+            print j
+            print entropy[j]
             dest_i[j] = entropy[j];
     }
 }
