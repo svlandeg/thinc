@@ -151,8 +151,6 @@ void hash_data(char* dest,
 
         MurmurHash3_x64_128(src_i, in_size, seed, entropy);
         for (int j=0; j < out_size; ++j)
-            print j
-            print entropy[j]
             dest_i[j] = entropy[j];
     }
 }
