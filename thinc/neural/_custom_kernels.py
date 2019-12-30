@@ -30,7 +30,8 @@ def compile_mmh(src):
     if cupy is None:
         return None
     print("compiling source")
-    return cupy.RawKernel(src, "hash_data", options=('-I, C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\ucrt'))
+    return cupy.RawKernel(src, "hash_data", options=('-I', 'C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.18362.0\\ucrt',
+                                                     '-I', 'C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include'))
     
 PWD = Path(__file__).parent
 SRC = (PWD / "_custom_kernels.cu").open("r", encoding="utf8").read()
@@ -197,11 +198,6 @@ def hash(ids, seed, out=None, threads_per_block=128, num_blocks=128):
     print("T", T)
     # print("MMH_SRC", MMH_SRC)
 
-    hash_data_kernel = compile_mmh(MMH_SRC)  # TODO: use KERNELS["hash"] instead ?
-
-    print("hash_data_kernel", hash_data_kernel)
-    print(" attributes", hash_data_kernel.attributes)
-
     print(" num_blocks", num_blocks)
     print(" threads_per_block", threads_per_block)
     print(" out", out)
@@ -209,6 +205,13 @@ def hash(ids, seed, out=None, threads_per_block=128, num_blocks=128):
     print(" in_size", in_size)
     print(" ids.shape[0]", ids.shape[0])
     print(" seed", seed)
+
+    hash_data_kernel = compile_mmh(MMH_SRC)  # TODO: use KERNELS["hash"] instead ?
+
+    print("hash_data_kernel", hash_data_kernel)
+    print(" attributes", hash_data_kernel.attributes)
+
+
 
     hash_data_kernel((num_blocks,), (threads_per_block,),
         (out, ids, out_size, in_size, ids.shape[0], seed))

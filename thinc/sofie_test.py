@@ -20,7 +20,7 @@ if __name__ == "__main__":
     spacy.require_gpu()
     print("This is with GPU.")
 
-    nlp = spacy.load("en_core_web_md")
+    nlp = spacy.load("en_core_web_sm")
     sentences = [
         "The decrease in 2008 primarily relates to the decrease in cash and cash equivalents 1.\n",
         "The Company's current liabilities of &euro;32.6 million primarily relate to deferred income from collaborative arrangements and trade payables.\n",

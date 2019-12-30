@@ -11,7 +11,6 @@
  * This version is taken from https://github.com/PeterScott/murmur3
  * and modified to work with CUDA.
  */
-// Including stdint.h is a pain in cupy, so just put the declarations in.
 typedef unsigned char                uint8_t;
 typedef unsigned int                uint32_t;
 typedef unsigned long int        uint64_t;
@@ -19,8 +18,6 @@ typedef signed char                int8_t;
 typedef int                        int32_t;
 typedef long int                int64_t;
 
-//-----------------------------------------------------------------------------
-// Platform-specific functions and macros
 
 #define FORCE_INLINE
 
@@ -160,12 +157,12 @@ void hash_data(char* dest,
     int _loop_stride = blockDim.x * gridDim.x;
     for (int i = _loop_start; i < n_items; i += _loop_stride)
     {
-    
+
         const char* src_i = &src[i*in_size];
         char* dest_i = &dest[i*out_size];
-    
+
         MurmurHash3_x64_128(src_i, in_size, seed, entropy);
         for (int j=0; j < out_size; ++j)
-            dest_i[j] = entropy[j];	
+            dest_i[j] = entropy[j];
     }
 }
