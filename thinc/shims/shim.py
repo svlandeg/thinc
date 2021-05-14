@@ -7,7 +7,8 @@ import threading
 
 class Shim:  # pragma: no cover
     """Define a basic interface for external models. Users can create subclasses
-    of 'shim' to wrap external libraries. We provide shims for PyTorch.
+    of 'shim' to wrap external libraries. We provide shims for PyTorch, TensorFlow 
+    and MXNet.
 
     The Thinc Model class treats Shim objects as a sort of special type of
     sublayer: it knows they're not actual Thinc Model instances, but it also

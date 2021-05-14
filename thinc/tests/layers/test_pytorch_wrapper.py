@@ -65,17 +65,31 @@ def test_pytorch_roundtrip_conversion():
 
 
 @pytest.mark.skipif(not has_torch, reason="needs PyTorch")
-def test_pytorch_wrapper_roundtrip():
+@pytest.mark.parametrize("nN,nI,nO", [(2, 3, 4)])
+def test_pytorch_wrapper_roundtrip(nN, nI, nO):
     import torch.nn
 
-    model = PyTorchWrapper(torch.nn.Linear(2, 3))
+    model = PyTorchWrapper(torch.nn.Linear(nI, nO))
+    X = numpy.zeros((nN, nI), dtype="f")
+    X += numpy.random.uniform(size=X.size).reshape(X.shape)
+    Y = numpy.zeros((nN, nO), dtype="f")
+    sgd = SGD(0.001)
+    Yh, get_dX = model.begin_update(X)
+    dYh = (Yh - Y) / Yh.shape[0]
+    dX = get_dX(dYh)
+    model.finish_update(sgd)
+    preds = model.predict(X)
+
     model_bytes = model.to_bytes()
-    PyTorchWrapper(torch.nn.Linear(2, 3)).from_bytes(model_bytes)
+    model2 = PyTorchWrapper(torch.nn.Linear(nI, nO))
+    model2.from_bytes(model_bytes)
+    assert numpy.array_equal(preds, model2.predict(X))
     with make_tempdir() as path:
         model_path = path / "model"
         model.to_disk(model_path)
-        new_model = PyTorchWrapper(torch.nn.Linear(2, 3)).from_bytes(model_bytes)
-        new_model.from_disk(model_path)
+        model3 = PyTorchWrapper(torch.nn.Linear(nI, nO))
+        model3.from_disk(model_path)
+        assert numpy.array_equal(preds, model3.predict(X))
 
 
 @pytest.mark.skipif(not has_torch, reason="needs PyTorch")
