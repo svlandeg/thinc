@@ -362,9 +362,9 @@ class Ops:
         robust network and less overfitting.
         """
         if drop is None or drop <= 0:
-            return self.xp.ones(shape, dtype="f")
+            return cast(FloatsXd, self.xp.ones(shape, dtype="f"))
         elif drop >= 1.0:
-            return self.alloc(shape)
+            return self.alloc(shape, dtype="float32")
         coinflips = self.xp.random.uniform(0.0, 1.0, shape)
         mask = (coinflips >= drop) / (1.0 - drop)
         return cast(FloatsXd, self.asarray(mask, dtype="float32"))
